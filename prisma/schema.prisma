@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tasks {
+  task_id  Int        @id(map: "pk_tasks_task_id") @default(autoincrement())
+  title    String
+  user_id  Int?
+  created  String?
+  category Categories
+  private  Boolean    @default(false)
+  status   Boolean    @default(false)
+  likes    likes[]
+  users    users?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tasks_users")
+}
+
+model users {
+  user_id           Int     @id(map: "pk_users_user_id") @default(autoincrement())
+  user_name         String
+  user_email        String  @unique(map: "un_user_email")
+  user_passwor_hash String
+  avatar            String? @default("default.webp")
+  likes             likes[]
+  tasks             tasks[]
+}
+
+model likes {
+  like_id Int    @id(map: "pk_likes_like_id") @default(autoincrement())
+  user_id Int?
+  task_id Int?
+  tasks   tasks? @relation(fields: [task_id], references: [task_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tasks_likes")
+  users   users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_users_likes")
+}
+
+enum Categories {
+  Sport
+  Study
+  Habbits
+}
